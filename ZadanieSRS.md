@@ -33,9 +33,23 @@ Dokument ten jest podzielony na kluczowe sekcje. Rozdział 1 stanowi wprowadzeni
 *   **Generowanie Codziennego Outfitu:** Proponowanie zestawu ubrań na podstawie pogody i preferencji.
 *   **Uwierzytelnianie Użytkownika:** Rejestracja i logowanie.
 
-### 2.2. Klasy Użytkowników
-W systemie występuje jedna główna klasa użytkownika:
-*   **Użytkownik Aplikacji:** Osoba, która chce otrzymywać codzienne sugestie ubioru na podstawie posiadanej garderoby i warunków pogodowych.
+### 2.2. Klasy Użytkowników i Aktorzy Systemu
+
+Na podstawie analizy interakcji z systemem (przedstawionej w diagramie przypadków użycia) identyfikujemy następujących aktorów:
+
+*   **Aktor Główny (Użytkownik Końcowy):**
+    *   **Opis:** Jest to główna i jedyna klasa użytkownika ludzkiego w systemie. Reprezentuje osobę, która instaluje aplikację w celu rozwiązania swojego codziennego problemu z doborem stroju.
+    *   **Interakcje z systemem:**
+        *   **Zarządza swoim kontem:** Rejestruje się, loguje i definiuje swoje preferencje w ankiecie stylu.
+        *   **Zarządza Wirtualną Szafą:** Buduje cyfrową garderobę poprzez dodawanie, przeglądanie i usuwanie swoich ubrań.
+        *   **Konsumuje główną wartość:** Otrzymuje i przegląda codzienne, automatycznie generowane propozycje outfitów.
+
+*   **Aktor Drugorzędny (System Zewnętrzny):**
+    *   **Nazwa:** **API Pogodowe**
+    *   **Opis:** Jest to zewnętrzna usługa (system maszynowy), która dostarcza kluczowych danych niezbędnych do działania aplikacji. Nie jest to użytkownik ludzki, ale pełni rolę aktora, ponieważ system wchodzi z nim w interakcję w celu realizacji jednego z przypadków użycia.
+    *   **Interakcje z systemem:**
+        *   Dostarcza aktualne dane meteorologiczne (temperatura, warunki, np. deszcz, słońce) dla określonej lokalizacji geograficznej na żądanie systemu WearWise.
+
 
 ### 2.3. Ograniczenia projektowe
 *   **Ograniczenie Technologiczne:** Aplikacja kliencka musi być zbudowana przy użyciu **React Native**, a backend musi opierać się na platformie **Supabase**.
