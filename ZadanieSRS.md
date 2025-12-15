@@ -130,6 +130,18 @@ Na podstawie analizy interakcji z systemem (przedstawionej w diagramie przypadk�
 3.  **Modyfikowalność:** Ważna w kontekście przyszłego rozwoju. Architektura musi pozwalać na łatwe dodawanie nowych funkcji (np. integracja z e-commerce, funkcje społecznościowe) bez przepisywania całości.
 4.  **Bezpieczeństwo:** Standardowy wymóg, ale mniej krytyczny niż w aplikacjach finansowych. Obejmuje ochronę danych logowania i wizerunku (zdjęcia ubrań).
 
+### 4.2. Mierzalna specyfikacja (dla TOP 3 atrybutów)
+
+#### Scenariusz 1: Wydajność (Generowanie Outfitu)
+| Element | Opis |
+| :--- | :--- |
+| **Źródło bodźca** | Użytkownik końcowy. |
+| **Bodziec** | Otwarcie aplikacji na ekranie głównym. |
+| **Artefakt** | Cały system (aplikacja mobilna, backend, API pogodowe). |
+| **Środowisko** | Normalne działanie, użytkownik ma połączenie z internetem. |
+| **Reakcja** | System pobiera pogodę, analizuje szafę użytkownika i wyświetla gotowy outfit. |
+| **Miara reakcji** | Czas od otwarcia aplikacji do pełnego wyświetlenia propozycji outfitu jest **krótszy niż 2 sekundy dla 95% przypadków**. |
+
 ## 5. Odkrywanie i Analiza Wymagań
 
 ### 5.1. Analiza Porównawcza
