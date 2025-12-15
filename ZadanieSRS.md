@@ -56,3 +56,21 @@ W systemie występuje jedna główna klasa użytkownika:
     *   **Założenie:** Zakładamy, że użytkownicy będą gotowi poświęcić czas na sfotografowanie i skatalogowanie co najmniej 15-20 sztuk swoich ubrań, aby system mógł generować sensowne propozycje.
     *   **Ryzyko:** Jeśli proces dodawania ubrań będzie zbyt uciążliwy, użytkownicy porzucą aplikację, zanim system zgromadzi wystarczająco danych, by być użytecznym. Aplikacja zostanie uznana za bezwartościową.
     *   **Plan walidacji:** Przed implementacją docelowej funkcjonalności, projektant UX stworzy klikalny prototyp (w Figmie) procesu dodawania ubrania i przeprowadzi testy użyteczności z 5 potencjalnymi użytkownikami, mierząc czas i subiektywną ocenę łatwości tego procesu.
+
+
+## 3. Wymagania Funkcjonalne
+
+### 3.1. Zarządzanie Wirtualną Szafą
+*   **Opis:** Umożliwia użytkownikom dodawanie i kategoryzowanie posiadanych ubrań.
+*   **Historyjka Użytkownika:** Jako użytkownik, chcę móc dodać zdjęcie mojego ubrania i przypisać je do kategorii, abym mógł zbudować cyfrową wersję mojej szafy.
+*   **Cel Biznesowy:** Zgromadzenie danych o garderobie użytkownika, które są niezbędne do działania głównej funkcji aplikacji.
+*   **Warunki Wstępne:** Użytkownik jest zalogowany w systemie.
+*   **Warunki Końcowe:** Nowy element garderoby zostaje zapisany w systemie i jest powiązany z profilem użytkownika.
+*   **Kryteria Akceptacji:**
+    *   **WF-SZAFA-01: Pomyślne dodanie nowego ubrania (Scenariusz Główny)**
+        *   **Given:** Jestem zalogowanym użytkownikiem na ekranie "Moja Szafa".
+        *   **When:** Kliknę przycisk "Dodaj ubranie", zrobię zdjęcie, wybiorę kategorię (np. "Koszula") i typ pogody (np. "Na ciepłe dni"), a następnie zatwierdzę formularz.
+        *   **Then:** Zdjęcie ubrania jest przesyłane do Supabase Storage.
+        *   **And:** W bazie danych zostaje utworzony nowy rekord ubrania z linkiem do zdjęcia i przypisanymi atrybutami.
+        *   **And:** Nowe ubranie pojawia się na liście w mojej wirtualnej szafie.
+
