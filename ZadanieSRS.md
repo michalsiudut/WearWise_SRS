@@ -120,3 +120,14 @@ Na podstawie analizy interakcji z systemem (przedstawionej w diagramie przypadk�
 
 **Uzasadnienie:** Do MVP wybrano funkcje o najwyższym priorytecie, które tworzą kompletny, minimalny cykl życia użytkownika: rejestracja, dodanie ubrań i otrzymanie propozycji. Bez którejkolwiek z nich aplikacja jest bezużyteczna.
 
+---
+
+## 4. Atrybuty Jakościowe
+
+### 4.1. Priorytetyzacja Atrybutów
+1.  **Wydajność:** Kluczowa dla pozytywnego pierwszego wrażenia. Użytkownik oczekuje natychmiastowej propozycji ubioru po otwarciu aplikacji.
+2.  **Dostępność:** Aplikacja musi być dostępna każdego ranka, gdy użytkownik się ubiera. Awaria w tym momencie podważa sens istnienia produktu.
+3.  **Modyfikowalność:** Ważna w kontekście przyszłego rozwoju. Architektura musi pozwalać na łatwe dodawanie nowych funkcji (np. integracja z e-commerce, funkcje społecznościowe) bez przepisywania całości.
+4.  **Bezpieczeństwo:** Standardowy wymóg, ale mniej krytyczny niż w aplikacjach finansowych. Obejmuje ochronę danych logowania i wizerunku (zdjęcia ubrań).
+
+
