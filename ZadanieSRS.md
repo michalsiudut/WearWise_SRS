@@ -74,3 +74,23 @@ W systemie występuje jedna główna klasa użytkownika:
         *   **And:** W bazie danych zostaje utworzony nowy rekord ubrania z linkiem do zdjęcia i przypisanymi atrybutami.
         *   **And:** Nowe ubranie pojawia się na liście w mojej wirtualnej szafie.
 
+### 3.2. Generowanie Codziennego Outfitu
+*   **Opis:** System automatycznie generuje i prezentuje użytkownikowi propozycję ubioru na dany dzień.
+*   **Historyjka Użytkownika:** Jako użytkownik, chcę codziennie rano otrzymywać jedną, gotową propozycję ubioru, abym nie musiał/a tracić czasu na podejmowanie decyzji.
+*   **Cel Biznesowy:** Dostarczenie kluczowej wartości aplikacji, która rozwiązuje codzienny problem użytkownika i zachęca do regularnego korzystania z produktu.
+*   **Warunki Wstępne:** Użytkownik jest zalogowany, ma w szafie co najmniej 5 ubrań z różnych kategorii i udzielił zgody na dostęp do lokalizacji.
+*   **Warunki Końcowe:** Użytkownik widzi na ekranie głównym zestawienie ubrań (outfit) na dziś.
+*   **Kryteria Akceptacji:**
+    *   **WF-OUTFIT-01: Wygenerowanie propozycji dla słonecznej pogody (Scenariusz Główny)**
+        *   **Given:** Jestem zalogowanym użytkownikiem, a prognoza pogody dla mojej lokalizacji to 25°C i słońce.
+        *   **And:** W mojej szafie znajdują się T-shirty, krótkie spodenki i sandały oznaczone jako odpowiednie na ciepłą pogodę.
+        *   **When:** Otwieram aplikację.
+        *   **Then:** System pobiera aktualne dane pogodowe.
+        *   **And:** System wyświetla mi zestaw składający się z jednego T-shirtu, jednych krótkich spodenek i jednych sandałów z mojej szafy.
+    *   **WF-OUTFIT-02: Brak wystarczającej liczby ubrań (Scenariusz Wyjątkowy)**
+        *   **Given:** Jestem nowym, zalogowanym użytkownikiem.
+        *   **And:** Dodałem do mojej szafy tylko 2 T-shirty.
+        *   **When:** Otwieram aplikację, oczekując propozycji outfitu.
+        *   **Then:** System powinien wyświetlić komunikat: "Dodaj więcej ubrań z różnych kategorii (np. spodnie, buty), abyśmy mogli tworzyć dla Ciebie stylizacje!".
+        *   **And:** Propozycja outfitu nie jest generowana.
+
