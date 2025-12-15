@@ -10,7 +10,7 @@ Niniejszy dokument stanowi Specyfikację Wymagań Oprogramowania (SRS) dla aplik
 
 ### 1.2. Wizja, Zakres i Cele Produktu
 *   **Wizja:** Być inteligentnym, osobistym stylistą w kieszeni każdego, kto chce ubierać się odpowiednio do pogody i własnego stylu, bez codziennego zastanawiania się "w co się ubrać?".
-*   **Zakres:** Aplikacja "WearWise" umożliwi użytkownikom katalogowanie posiadanych ubrań poprzez dodawanie ich zdjęć i podstawowych atrybutów. Na podstawie danych pogodowych pobieranych w czasie rzeczywistym dla lokalizacji użytkownika oraz jego preferencji określonych w krótkiej ankiecie, system będzie codziennie proponował gotowy zestaw ubrań.
+*   **Zakres:** Aplikacja WearWise pozwala na stworzenie cyfrowego inwentarza Twojej szafy. Użytkownik dodaje zdjęcia swoich ubrań i opisuje je kilkoma atrybutami. Następnie, nasz inteligentny algorytm, bazując na aktualnej prognozie pogody dla Twojej lokalizacji oraz Twoich indywidualnych preferencjach, każdego ranka serwuje gotową propozycję stylizacji.
 *   **Poza Zakresem:** Wersja 1.0 aplikacji nie będzie zawierać funkcji społecznościowych (udostępnianie stylizacji, komentowanie), e-commerce (zakup ubrań), ani zaawansowanego zarządzania szafą (np. planowanie prania).
 
 ### 1.3. Definicje, Akronimy i Skróty
