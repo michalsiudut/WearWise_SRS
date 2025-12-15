@@ -1,5 +1,4 @@
 # Specyfikacja Wymagań Oprogramowania (SRS) dla Aplikacji "WearWise"
-### Wersja 1.0
 
 ---
 
