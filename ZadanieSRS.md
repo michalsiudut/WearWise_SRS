@@ -142,6 +142,16 @@ Na podstawie analizy interakcji z systemem (przedstawionej w diagramie przypadk�
 | **Reakcja** | System pobiera pogodę, analizuje szafę użytkownika i wyświetla gotowy outfit. |
 | **Miara reakcji** | Czas od otwarcia aplikacji do pełnego wyświetlenia propozycji outfitu jest **krótszy niż 2 sekundy dla 95% przypadków**. |
 
+#### Scenariusz 2: Dostępność (Poranna Gotowość)
+| Element | Opis |
+| :--- | :--- |
+| **Źródło bodźca** | Wewnętrzny system monitorujący. |
+| **Bodziec** | Awaria pojedynczej instancji serwera aplikacyjnego lub bazy danych. |
+| **Artefakt** | Infrastruktura backendowa na Supabase. |
+| **Środowisko** | Godziny szczytu porannego (6:00 - 9:00 AM). |
+| **Reakcja** | System powinien kontynuować działanie bez widocznej przerwy dla użytkownika. |
+| **Miara reakcji** | Dostępność usługi generowania outfitów wynosi **99.5%** w skali miesiąca. |
+
 ## 5. Odkrywanie i Analiza Wymagań
 
 ### 5.1. Analiza Porównawcza
