@@ -152,6 +152,16 @@ Na podstawie analizy interakcji z systemem (przedstawionej w diagramie przypadk�
 | **Reakcja** | System powinien kontynuować działanie bez widocznej przerwy dla użytkownika. |
 | **Miara reakcji** | Dostępność usługi generowania outfitów wynosi **99.5%** w skali miesiąca. |
 
+#### Scenariusz 3: Modyfikowalność (Dodanie Nowego Atrybutu Ubrania)
+| Element | Opis |
+| :--- | :--- |
+| **Źródło bodźca** | Deweloper. |
+| **Bodziec** | Konieczność dodania nowego atrybutu do ubrań, np. "formalność" (codzienne, biznesowe). |
+| **Artefakt** | Baza danych, backend (logika generowania outfitu), aplikacja mobilna (formularz dodawania). |
+| **Środowisko** | Środowisko deweloperskie. |
+| **Reakcja** | Deweloper modyfikuje schemat bazy, logikę i interfejs użytkownika. |
+| **Miara reakcji** | Czas pracy potrzebny na zaimplementowanie i wdrożenie tej zmiany **nie przekracza 4 godzin roboczych**. |
+
 ## 5. Odkrywanie i Analiza Wymagań
 
 ### 5.1. Analiza Porównawcza
