@@ -94,3 +94,15 @@ W systemie występuje jedna główna klasa użytkownika:
         *   **Then:** System powinien wyświetlić komunikat: "Dodaj więcej ubrań z różnych kategorii (np. spodnie, buty), abyśmy mogli tworzyć dla Ciebie stylizacje!".
         *   **And:** Propozycja outfitu nie jest generowana.
 
+### 3.3. Priorytetyzacja Wymagań dla MVP
+| Funkcja | Korzyść | Kara | Koszt | Ryzyko | Priorytet = (K+Ka)/(Ko+R) | Kandydat do MVP? |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| Uwierzytelnianie użytkownika | 8 | 13 | 3 | 2 | **4.20** | **Tak** |
+| Dodawanie ubrań do szafy | 13 | 21 | 8 | 5 | **2.61** | **Tak** |
+| Generowanie outfitu | 21 | 13 | 13 | 8 | **1.62** | **Tak** |
+| Ankieta preferencji stylu | 8 | 5 | 5 | 3 | **1.62** | **Tak** |
+| Edycja/Usuwanie ubrań | 5 | 8 | 3 | 2 | **2.60** | **Tak** |
+| Udostępnianie stylizacji | 3 | 1 | 8 | 5 | **0.31** | Nie |
+
+**Uzasadnienie:** Do MVP wybrano funkcje o najwyższym priorytecie, które tworzą kompletny, minimalny cykl życia użytkownika: rejestracja, dodanie ubrań i otrzymanie propozycji. Bez którejkolwiek z nich aplikacja jest bezużyteczna.
+
