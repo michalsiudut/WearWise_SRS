@@ -162,6 +162,8 @@ Na podstawie analizy interakcji z systemem (przedstawionej w diagramie przypadk�
 
 #### Diagram Przypadków Użycia
 
+![UML Diagram](uml.png)
+
 ### Dodatek B: Persony Użytkowników
 
 #### Persona 1: "Zajęty Profesjonalista"
