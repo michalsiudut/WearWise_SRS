@@ -162,6 +162,17 @@ Na podstawie analizy interakcji z systemem (przedstawionej w diagramie przypadk�
 | **Reakcja** | Deweloper modyfikuje schemat bazy, logikę i interfejs użytkownika. |
 | **Miara reakcji** | Czas pracy potrzebny na zaimplementowanie i wdrożenie tej zmiany **nie przekracza 4 godzin roboczych**. |
 
+
+### 4.3. Analiza Kompromisów Architektonicznych
+*   **Cel (Wydajność):** Osiągnięcie czasu odpowiedzi < 2s.
+*   **Możliwe rozwiązanie:** Pre-generowanie outfitów w nocy dla wszystkich użytkowników i przechowywanie ich w cache.
+*   **Kompromis:**
+    *   **Pozytywny:** Drastycznie poprawia **wydajność** odczuwalną przez użytkownika rano.
+    *   **Negatywny:**
+        *   Zwiększa **koszt operacyjny** (dodatkowe zasoby obliczeniowe w nocy).
+        *   Pogarsza **elastyczność** - jeśli użytkownik doda nowe ubranie rano, nie zostanie ono uwzględnione w outficie na ten dzień, chyba że zaimplementuje się skomplikowaną logikę re-walidacji.
+
+
 ## 5. Odkrywanie i Analiza Wymagań
 
 ### 5.1. Analiza Porównawcza
