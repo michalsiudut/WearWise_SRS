@@ -227,3 +227,114 @@ Na podstawie analizy interakcji z systemem (przedstawionej w diagramie przypadk�
 2.  Jak dokładnie zdefiniować "styl" użytkownika w ankiecie, aby był on zrozumiały i użyteczny dla algorytmu? (Wymaga prototypowania i testów UX)
 3.  W jaki sposób aplikacja ma obsługiwać ubrania uniwersalne, np. jeansy, które pasują zarówno na chłodne, jak i cieplejsze dni? (Wymaga decyzji projektowej)
 4.  Czy zdjęcia ubrań będą przechowywane prywatnie, czy Supabase domyślnie udostępnia je publicznie przez URL? (Kwestia bezpieczeństwa do weryfikacji)
+
+## Dodatek D: Szczegółowa Logika Algorytmu Rekomendacji "WearWise"
+
+### D.1. Wstęp
+Niniejszy dodatek definiuje techniczną logikę działania silnika rekomendacji w aplikacji WearWise. Algorytm jest systemem deterministycznym, opartym na regułach (Rule-Based System) oraz funkcji kosztu (Cost Function), mającym na celu dobranie optymalnego zestawu ubrań poprzez minimalizację "punktów karnych" za niedopasowanie termiczne, pogodowe i stylistyczne.
+
+### D.2. Model Danych Wejściowych
+Algorytm przetwarza dwa strumienie danych:
+
+1.  **Szafa Użytkownika (`CLOSET`)**: Lista obiektów, gdzie każdy przedmiot posiada atrybuty:
+    * `id`: Unikalny identyfikator.
+    * `type`: Kategoria (top, bottom, shoes).
+    * `layer`: Warstwa (1 - baza, 2 - środek, 3 - wierzch) – dotyczy tylko kategorii 'top'.
+    * `warmth`: Indeks ciepła (skala 1-10).
+    * `rain_index`: Odporność na wodę (skala 0-10, gdzie 0 = przemakalne, 10 = wodoodporne).
+    * `tags`: Zbiór tagów (np. `["casual", "gym", "elegant"]`).
+    * `color`: Kolor dominujący (np. `"black"`, `"navy"`).
+
+2.  **Kontekst (`UserRequest`)**:
+    * `temperature`: Temperatura powietrza (°C).
+    * `wind_speed`: Prędkość wiatru (km/h).
+    * `weather_code`: Kod pogody WMO (definiuje opady).
+    * `occasion`: Kontekst wyjścia (`"casual"`, `"work"`, `"date"`, `"gym"`).
+    * `mood_score`: Preferencja stylu (1-5).
+
+### D.3. Krok 1: Fizyka Pogody (Pre-processing)
+System normalizuje surowe dane pogodowe do wartości odczuwalnych przez człowieka.
+
+* **Obliczanie Temperatury Odczuwalnej ($T_{real}$):**
+    Korekta uwzględniająca czynnik chłodzący wiatru (*Wind Chill*). Stosowana, gdy $T_{air} < 20^\circ C$.
+    $$T_{real} = T_{air} - (Wiatr \times 0.6)$$
+* **Normalizacja Opadów:**
+    Kody WMO są mapowane na skalę intensywności deszczu (0-30). Wartość $>5$ aktywuje tryb deszczowy.
+
+### D.4. Krok 2: Filtracja Krytyczna (Hard Constraints)
+Zanim system przystąpi do doboru zestawu, eliminuje z puli dostępnych ubrań te, które naruszają krytyczne zasady bezpieczeństwa lub kontekstu.
+
+1.  **Filtr Wodny:**
+    * *Warunek:* Jeśli Intensywność Deszczu $> 5$.
+    * *Akcja:* Odrzuć przedmioty z `rain_index < 5` (np. sandały, zamsz, jasne płótno).
+2.  **Filtr Termiczny (Zima):**
+    * *Warunek:* Jeśli $T_{real} < 10^\circ C$.
+    * *Akcja:* Odrzuć przedmioty o `warmth < 3` (np. szorty, cienkie spodnie).
+    * *Wyjątek:* T-shirty (`layer: 1`) są dozwolone jako bielizna termiczna/podkoszulek.
+3.  **Filtr Termiczny (Upał):**
+    * *Warunek:* Jeśli $T_{real} > 25^\circ C$.
+    * *Akcja:* Odrzuć przedmioty o `warmth > 4` (np. kurtki zimowe, ocieplane buty).
+4.  **Filtr Okazji (Context Filter):**
+    * *Warunek:* Zdefiniowana okazja inna niż "casual".
+    * *Akcja:*
+        * Dla `occasion="date"`: Odrzuć tagi `sport`, `gym`.
+        * Dla `occasion="gym"`: Wymagaj tagu `sport` lub `gym`.
+
+### D.5. Krok 3: Strategia Warstw (Dynamic Layering)
+Algorytm dynamicznie ustala szablon zestawu (sloty do wypełnienia) w zależności od $T_{real}$.
+
+| Warunki Termiczne | Struktura Zestawu (Sloty) | Cel Ciepła (Target Warmth) |
+| :--- | :--- | :--- |
+| **Lato** ($T_{real} \ge 22^\circ C$) | `[Top L1] + [Bottom] + [Shoes]` | **4 - 5 pkt** |
+| **Przejściowa** ($10^\circ C \le T_{real} < 22^\circ C$) | `[Top L1] + [Top L2] + [Bottom] + [Shoes]` | **10 - 15 pkt** |
+| **Zima** ($T_{real} < 10^\circ C$) | `[Top L1] + [Top L2] + [Top L3] + [Bottom] + [Shoes]` | **25+ pkt** |
+
+### D.6. Krok 4: Funkcja Kosztu i Selekcja (Scoring)
+System generuje możliwe kombinacje ubrań pasujące do wyznaczonych slotów. Każda kombinacja jest oceniana funkcją karną. Wygrywa zestaw z wynikiem najbliższym `0`.
+
+**Wzór Funkcji Kosztu:**
+$$Score = (0.6 \cdot \Delta Warm) + (0.5 \cdot \Delta Rain) + (0.5 \cdot StylePenalty)$$
+
+**Składniki:**
+* **$\Delta Warm$**: Wartość bezwzględna różnicy między *Celem Ciepła* a sumą atrybutów `warmth` wszystkich elementów zestawu.
+* **$\Delta Rain$**: Różnica między intensywnością deszczu a średnią wodoodpornością zestawu (karane tylko niedostateczne zabezpieczenie).
+* **$StylePenalty$ (Fashion Police)**:
+    * **+50 pkt** (Kara krytyczna): Za wykrycie "zakazanych par" kolorystycznych (np. Czerń + Brąz, Czerwień + Zieleń).
+    * **-10 pkt** (Bonus): Za zestaw monochromatyczny (spójność kolorystyczna).
+
+### D.7. Schemat Działania Algorytmu
+
+```mermaid
+graph TD
+    %% Definicja stylów
+    classDef process fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef decision fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;
+    classDef terminator fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px;
+
+    Start((Start)) --> Input[Pobranie Danych:<br/>Pogoda + Szafa + Okazja]
+    Input --> Physics[Obliczanie Fizyki:<br/>Wind Chill & Rain Intensity]
+    Physics --> Filter{HARD CONSTRAINTS<br/>Filtrowanie Szafy}
+    
+    Filter -->|Odrzuć| Bin[Kosz:<br/>Przemakalne, Nieadekwatne termicznie,<br/>Zły styl na okazję]
+    Filter -->|Akceptuj| Valid[Lista: Valid Closet]
+    
+    Valid --> Layers{Jaka Temperatura?}
+    
+    Layers -->|Zimno <10C| L3[Sloty: Baza + Środek + Kurtka]
+    Layers -->|Średnio 10-22C| L2[Sloty: Baza + Środek]
+    Layers -->|Ciepło >22C| L1[Sloty: Baza]
+    
+    L3 & L2 & L1 --> Combo[Generowanie Kombinacji<br/>Iloczyn Kartezjański]
+    
+    Combo --> Score{OCENA PUNKTOWA}
+    Score --> Calc1[Kara za różnicę ciepła]
+    Score --> Calc2[Kara za brak wodoodporności]
+    Score --> Calc3[Kara za gryzące się kolory]
+    
+    Calc1 & Calc2 & Calc3 --> Sum[Suma Punktów Karnych]
+    Sum --> Best[Wybierz zestaw z MIN Score]
+    Best --> Output(((WYNIK:<br/>Lista ID Ubrań)))
+
+    class Input,Physics,Valid,L1,L2,L3,Combo,Calc1,Calc2,Calc3,Sum,Best process;
+    class Filter,Layers,Score decision;
+    class Start,Output terminator;
