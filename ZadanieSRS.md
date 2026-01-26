@@ -85,6 +85,28 @@ Na podstawie analizy interakcji z systemem (przedstawionej w diagramie przypadk�
     *   **Ryzyko:** Jeśli proces dodawania ubrań będzie zbyt uciążliwy, użytkownicy porzucą aplikację, zanim system zgromadzi wystarczająco danych, by być użytecznym. Aplikacja zostanie uznana za bezwartościową.
     *   **Plan walidacji:** Przed implementacją docelowej funkcjonalności, projektant UX stworzy klikalny prototyp (w Figmie) procesu dodawania ubrania i przeprowadzi testy użyteczności z 5 potencjalnymi użytkownikami, mierząc czas i subiektywną ocenę łatwości tego procesu.
 
+## 2.5. **[DODANE] Cele Biznesowe Systemu WearWise**
+
+Celem biznesowym projektu WearWise jest stworzenie skalowalnej aplikacji mobilnej, która dostarcza realną wartość użytkownikowi końcowemu, jednocześnie umożliwiając dalszą monetyzację produktu w kolejnych wersjach.
+
+### 2.5.1. Cele Krótkoterminowe (MVP – 0–6 miesięcy)
+
+* **CB-01:** Osiągnięcie minimum **1 000 aktywnych użytkowników miesięcznie (MAU)** w ciągu pierwszych 3 miesięcy od wdrożenia.
+* **CB-02:** Zapewnienie, aby co najmniej **70% użytkowników**, którzy dodadzą minimum 10 ubrań, korzystało z funkcji generowania outfitu przynajmniej raz dziennie.
+* **CB-03:** Zminimalizowanie bariery wejścia – pełna funkcjonalność MVP dostępna **bez opłat**.
+* **CB-04:** Zbudowanie kompletnego zbioru danych (szafy + preferencje), który umożliwi rozwój algorytmów rekomendacyjnych.
+
+### 2.5.2. Cele Średnioterminowe (6–18 miesięcy)
+
+* **CB-05:** Wprowadzenie modelu **Freemium** (np. wiele outfitów dziennie, planowanie tygodnia).
+* **CB-06:** Zwiększenie retencji użytkowników (D30) do poziomu **≥ 35%**.
+* **CB-07:** Przygotowanie architektury pod integrację z partnerami (marki odzieżowe, e-commerce).
+
+### 2.5.3. Cele Długoterminowe (Strategiczne)
+
+* **CB-08:** Pozycjonowanie WearWise jako „inteligentnego asystenta stylu”, a nie tylko katalogu ubrań.
+* **CB-09:** Możliwość wykorzystania zagregowanych (anonimowych) danych do analiz trendów modowych.
+
 
 ## 3. Wymagania Funkcjonalne
 
