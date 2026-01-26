@@ -51,13 +51,28 @@ Na podstawie analizy interakcji z systemem (przedstawionej w diagramie przypadk�
 
 
 ### 2.3. Ograniczenia projektowe
-*   **Ograniczenie Technologiczne:** Aplikacja kliencka musi być zbudowana przy użyciu **React Native**, a backend musi opierać się na platformie **Supabase**.
-    *   **Źródło:** Wymagania zadania projektowego.
-    *   **Wpływ na architekturę:** Narzuca konkretny stos technologiczny. Wyklucza inne frameworki mobilne (np. Flutter, Swift/Kotlin natywnie) oraz inne rozwiązania backendowe (np. customowy backend w Node.js, Firebase). Wymusza użycie PostgREST API i narzędzi dostarczanych przez Supabase do obsługi bazy danych, uwierzytelniania i przechowywania plików.
 
-*   **Ograniczenie Zależności Zewnętrznej:** System jest w pełni zależny od zewnętrznego dostawcy API pogodowego.
-    *   **Źródło:** Kluczowa funkcjonalność aplikacji.
-    *   **Wpływ na architekturę:** Konieczność zaprojektowania modułu integrującego się z API pogodowym, który będzie odporny na jego ewentualne awarie lub zmiany. Należy zaimplementować mechanizmy buforowania (caching) odpowiedzi, aby zminimalizować liczbę zapytań i koszty oraz zapewnić działanie aplikacji w przypadku chwilowej niedostępności usługi.
+> **[DODANE]** 
+* **Ograniczenie Zasobów Czasowych Zespołu:**
+    * **Źródło:** Projekt realizowany w ramach jednego semestru akademickiego.
+    * **Wpływ na architekturę:** Konieczność ograniczenia zakresu funkcjonalnego do MVP oraz unikania rozwiązań wymagających długiego czasu implementacji (np. własnych algorytmów ML, zaawansowanej personalizacji). Architektura musi umożliwiać szybkie dostarczanie działających funkcji w krótkich iteracjach.
+
+* **Ograniczenie Kompetencji Technicznych Zespołu:**
+    * **Źródło:** Zespół składa się z studentów o zróżnicowanym poziomie doświadczenia w technologiach mobilnych i backendowych.
+    * **Wpływ na architekturę:** Preferowane są rozwiązania o niskim progu wejścia, dobrze udokumentowane i z szerokim wsparciem społeczności. Wyklucza to implementację skomplikowanych wzorców architektonicznych oraz niestandardowych rozwiązań infrastrukturalnych.
+
+* **Ograniczenie Budżetowe:**
+    * **Źródło:** Projekt nie posiada dedykowanego budżetu finansowego.
+    * **Wpływ na architekturę:** Wymusza wykorzystanie wyłącznie darmowych planów narzędzi i usług (Supabase Free Tier, darmowe API pogodowe). Ogranicza skalę przechowywanych danych, liczbę zapytań do API oraz uniemożliwia korzystanie z płatnych usług chmurowych.
+
+* **Ograniczenie Infrastrukturalne:**
+    * **Źródło:** Brak możliwości utrzymywania własnych serwerów produkcyjnych przez zespół studencki.
+    * **Wpływ na architekturę:** Backend musi być w pełni oparty na rozwiązaniu typu BaaS (Backend as a Service). Wyklucza to architekturę opartą o samodzielnie zarządzane serwery, kontenery Docker czy zaawansowaną orkiestrację (np. Kubernetes).
+
+* **Ograniczenie Testowe i Operacyjne:**
+    * **Źródło:** Ograniczony dostęp do rzeczywistych użytkowników końcowych oraz środowisk produkcyjnych.
+    * **Wpływ na architekturę:** System musi być projektowany w sposób umożliwiający łatwe testowanie lokalne oraz ręczne testy akceptacyjne. Ogranicza to możliwość przeprowadzania testów obciążeniowych na dużą skalę oraz wymusza prostotę konfiguracji środowisk.
+
 
 ### 2.4. Założenia projektowe
 *   **Założenie Techniczne:**
@@ -73,60 +88,78 @@ Na podstawie analizy interakcji z systemem (przedstawionej w diagramie przypadk�
 
 ## 3. Wymagania Funkcjonalne
 
-### 3.1. Zarządzanie Wirtualną Szafą
-*   **Opis:** Umożliwia użytkownikom dodawanie i kategoryzowanie posiadanych ubrań.
-*   **Historyjka Użytkownika:** Jako użytkownik, chcę móc dodać zdjęcie mojego ubrania i przypisać je do kategorii, abym mógł zbudować cyfrową wersję mojej szafy.
-*   **Cel Biznesowy:** Zgromadzenie danych o garderobie użytkownika, które są niezbędne do działania głównej funkcji aplikacji.
-*   **Warunki Wstępne:** Użytkownik jest zalogowany w systemie.
-*   **Warunki Końcowe:** Nowy element garderoby zostaje zapisany w systemie i jest powiązany z profilem użytkownika.
-*   **Kryteria Akceptacji:**
-    *   **WF-SZAFA-01: Pomyślne dodanie nowego ubrania (Scenariusz Główny)**
-        *   **Given:** Jestem zalogowanym użytkownikiem na ekranie "Moja Szafa".
-        *   **When:** Kliknę przycisk "Dodaj ubranie", zrobię zdjęcie, wybiorę kategorię (np. "Koszula") i typ pogody (np. "Na ciepłe dni"), a następnie zatwierdzę formularz.
-        *   **Then:** Zdjęcie ubrania jest przesyłane do Supabase Storage.
-        *   **And:** W bazie danych zostaje utworzony nowy rekord ubrania z linkiem do zdjęcia i przypisanymi atrybutami.
-        *   **And:** Nowe ubranie pojawia się na liście w mojej wirtualnej szafie.
+> **[DODANE]** 
 
-### 3.2. Generowanie Codziennego Outfitu
-*   **Opis:** System automatycznie generuje i prezentuje użytkownikowi propozycję ubioru na dany dzień.
-*   **Historyjka Użytkownika:** Jako użytkownik, chcę codziennie rano otrzymywać jedną, gotową propozycję ubioru, abym nie musiał/a tracić czasu na podejmowanie decyzji.
-*   **Cel Biznesowy:** Dostarczenie kluczowej wartości aplikacji, która rozwiązuje codzienny problem użytkownika i zachęca do regularnego korzystania z produktu.
-*   **Warunki Wstępne:** Użytkownik jest zalogowany, ma w szafie co najmniej 5 ubrań z różnych kategorii i udzielił zgody na dostęp do lokalizacji.
-*   **Warunki Końcowe:** Użytkownik widzi na ekranie głównym zestawienie ubrań (outfit) na dziś.
-*   **Kryteria Akceptacji:**
-    *   **WF-OUTFIT-01: Wygenerowanie propozycji dla słonecznej pogody (Scenariusz Główny)**
-        *   **Given:** Jestem zalogowanym użytkownikiem, a prognoza pogody dla mojej lokalizacji to 25°C i słońce.
-        *   **And:** W mojej szafie znajdują się T-shirty, krótkie spodenki i sandały oznaczone jako odpowiednie na ciepłą pogodę.
-        *   **When:** Otwieram aplikację.
-        *   **Then:** System pobiera aktualne dane pogodowe.
-        *   **And:** System wyświetla mi zestaw składający się z jednego T-shirtu, jednych krótkich spodenek i jednych sandałów z mojej szafy.
-    *   **WF-OUTFIT-02: Brak wystarczającej liczby ubrań (Scenariusz Wyjątkowy)**
-        *   **Given:** Jestem nowym, zalogowanym użytkownikiem.
-        *   **And:** Dodałem do mojej szafy tylko 2 T-shirty.
-        *   **When:** Otwieram aplikację, oczekując propozycji outfitu.
-        *   **Then:** System powinien wyświetlić komunikat: "Dodaj więcej ubrań z różnych kategorii (np. spodnie, buty), abyśmy mogli tworzyć dla Ciebie stylizacje!".
-        *   **And:** Propozycja outfitu nie jest generowana.
+### 3.1. Uwierzytelnianie i Zarządzanie Kontem
 
-### 3.3. Priorytetyzacja Wymagań dla MVP
-| Funkcja | Korzyść | Kara | Koszt | Ryzyko | Priorytet = (K+Ka)/(Ko+R) | Kandydat do MVP? |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| Uwierzytelnianie użytkownika | 8 | 13 | 3 | 2 | **4.20** | **Tak** |
-| Dodawanie ubrań do szafy | 13 | 21 | 8 | 5 | **2.61** | **Tak** |
-| Generowanie outfitu | 21 | 13 | 13 | 8 | **1.62** | **Tak** |
-| Ankieta preferencji stylu | 8 | 5 | 5 | 3 | **1.62** | **Tak** |
-| Edycja/Usuwanie ubrań | 5 | 8 | 3 | 2 | **2.60** | **Tak** |
-| Udostępnianie stylizacji | 3 | 1 | 8 | 5 | **0.31** | Nie |
+#### 3.1.1. Rejestracja użytkownika
 
-**Uzasadnienie:** Do MVP wybrano funkcje o najwyższym priorytecie, które tworzą kompletny, minimalny cykl życia użytkownika: rejestracja, dodanie ubrań i otrzymanie propozycji. Bez którejkolwiek z nich aplikacja jest bezużyteczna.
+* **WF-AUTH-01:** System musi umożliwiać rejestrację użytkownika przy użyciu adresu e-mail i hasła.
+* **WF-AUTH-02:** Hasło musi mieć **minimum 8 znaków**, w tym co najmniej 1 cyfrę.
+* **WF-AUTH-03:** Po pomyślnej rejestracji użytkownik musi zostać automatycznie zalogowany.
+* **WF-AUTH-04:** System musi uniemożliwić rejestrację konta z adresem e-mail już istniejącym w bazie.
+
+#### 3.1.2. Logowanie
+
+* **WF-AUTH-05:** System musi umożliwiać logowanie w czasie **< 1 sekundy** przy poprawnych danych.
+* **WF-AUTH-06:** Po 5 nieudanych próbach logowania konto zostaje czasowo zablokowane (5 minut).
+
+---
+
+### 3.2. Zarządzanie Wirtualną Szafą (ROZSZERZONE)
+
+#### 3.2.1. Dodawanie ubrań
+
+* **WF-SZAFA-02:** System musi umożliwiać dodanie **minimum 100 ubrań** na jednego użytkownika.
+* **WF-SZAFA-03:** Każde ubranie musi posiadać obowiązkowe atrybuty:
+  * kategoria,
+  * zdjęcie,
+  * poziom ciepła (1–10),
+  * odporność na deszcz (0–10).
+* **WF-SZAFA-04:** Czas dodania jednego ubrania (od otwarcia formularza do zapisu) nie może przekroczyć **30 sekund**.
+
+#### 3.2.2. Przeglądanie i filtrowanie
+
+* **WF-SZAFA-05:** System musi umożliwiać filtrowanie ubrań według co najmniej **4 kryteriów** (kategoria, ciepło, kolor, okazja).
+* **WF-SZAFA-06:** Wyniki filtrowania muszą być wyświetlane w czasie **< 500 ms**.
+
+#### 3.2.3. Edycja i usuwanie
+
+* **WF-SZAFA-07:** Użytkownik musi mieć możliwość edycji wszystkich atrybutów ubrania.
+* **WF-SZAFA-08:** Usunięcie ubrania musi być potwierdzone dialogiem (ochrona przed błędem).
+
+---
+
+### 3.3. Ankieta Preferencji Stylu **[DODANE]**
+
+* **WF-STYL-01:** System musi przeprowadzić ankietę składającą się z **minimum 5 pytań**.
+* **WF-STYL-02:** Każde pytanie musi mieć skalę odpowiedzi (np. 1–5).
+* **WF-STYL-03:** Wyniki ankiety muszą być zapisane w profilu użytkownika i wykorzystywane przez algorytm rekomendacji.
+
+---
+
+### 3.4. Generowanie Codziennego Outfitu (ROZSZERZONE)
+
+* **WF-OUTFIT-03:** System musi generować **dokładnie jeden outfit dziennie** w wersji MVP.
+* **WF-OUTFIT-04:** Outfit musi składać się z **minimum 3 elementów** (góra, dół, buty).
+* **WF-OUTFIT-05:** Żadne ubranie nie może pojawić się w outficie częściej niż **2 dni z rzędu**.
+* **WF-OUTFIT-06:** Generowanie outfitu musi zakończyć się w czasie **< 2 sekund**.
+
+---
+
+### 3.5. Obsługa Sytuacji Wyjątkowych **[DODANE]**
+
+* **WF-EX-01:** W przypadku braku połączenia z API pogodowym system musi użyć **ostatnio zapisanej prognozy**.
+* **WF-EX-02:** W przypadku braku wystarczających danych system musi wyświetlić jasny komunikat z instrukcją dla użytkownika.
 
 ---
 
 ## 4. Atrybuty Jakościowe
 
 ### 4.1. Priorytetyzacja Atrybutów
-1.  **Wydajność:** Kluczowa dla pozytywnego pierwszego wrażenia. Użytkownik oczekuje natychmiastowej propozycji ubioru po otwarciu aplikacji.
+1.  **Modyfikowalność:** Ważna w kontekście przyszłego rozwoju. Architektura musi pozwalać na łatwe dodawanie nowych funkcji (np. integracja z e-commerce, funkcje społecznościowe) bez przepisywania całości.
 2.  **Dostępność:** Aplikacja musi być dostępna każdego ranka, gdy użytkownik się ubiera. Awaria w tym momencie podważa sens istnienia produktu.
-3.  **Modyfikowalność:** Ważna w kontekście przyszłego rozwoju. Architektura musi pozwalać na łatwe dodawanie nowych funkcji (np. integracja z e-commerce, funkcje społecznościowe) bez przepisywania całości.
+3.  **Wydajność:** Kluczowa dla pozytywnego pierwszego wrażenia. Użytkownik oczekuje natychmiastowej propozycji ubioru po otwarciu aplikacji.
 4.  **Bezpieczeństwo:** Standardowy wymóg, ale mniej krytyczny niż w aplikacjach finansowych. Obejmuje ochronę danych logowania i wizerunku (zdjęcia ubrań).
 
 ### 4.2. Mierzalna specyfikacja (dla TOP 3 atrybutów)
