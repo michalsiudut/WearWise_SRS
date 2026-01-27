@@ -4,7 +4,7 @@
 
 ## 1. Wstęp
 
-### 1.1. Cel
+### 1.1. Cel ogólny
 Niniejszy dokument stanowi Specyfikację Wymagań Oprogramowania (SRS) dla aplikacji mobilnej **WearWise**. Jest on przeznaczony dla zespołu deweloperskiego, projektantów UX/UI, testerów oraz interesariuszy projektu. Jego celem jest precyzyjne zdefiniowanie funkcjonalności, cech oraz ograniczeń systemu, stanowiąc podstawę do dalszych prac projektowych, implementacyjnych i testowych.
 
 ### 1.2. Wizja, Zakres i Cele Produktu
@@ -72,6 +72,18 @@ Na podstawie analizy interakcji z systemem (przedstawionej w diagramie przypadk�
 * **Ograniczenie Testowe i Operacyjne:**
     * **Źródło:** Ograniczony dostęp do rzeczywistych użytkowników końcowych oraz środowisk produkcyjnych.
     * **Wpływ na architekturę:** System musi być projektowany w sposób umożliwiający łatwe testowanie lokalne oraz ręczne testy akceptacyjne. Ogranicza to możliwość przeprowadzania testów obciążeniowych na dużą skalę oraz wymusza prostotę konfiguracji środowisk.
+
+* **Ograniczenia Prawne i Ochrony Danych (RODO):**
+    * **Źródło:** Rozporządzenie o Ochronie Danych Osobowych.
+    * **Wpływ na architekturę:** System musi zapewniać izolację danych użytkowników. Przechowywanie zdjęć wymaga implementacji mechanizmów bezpieczeństwa na poziomie bazy danych (np. Row Level Security w Supabase).
+
+* **Ograniczenie Interfejsu Programistycznego (API):**
+    * **Źródło:** Limity darmowych dostawców danych pogodowych (np. OpenWeatherMap).
+    * **Wpływ na architekturę:** Konieczność implementacji mechanizmu cachowania danych pogodowych, aby nie przekroczyć dobowego limitu zapytań przy rosnącej liczbie użytkowników testowych.
+
+* **Ograniczenie Rozmiaru Przechowywanych Danych:**
+    * **Źródło:** Limitowane miejsce w chmurze (np. 1GB w planie darmowym).
+    * **Wpływ na architekturę:** Wymusza implementację po stronie aplikacji mechanizmu kompresji zdjęć ubrań przed ich wysłaniem do bazy danych, aby oszczędzać miejsce w Bucket Storage.
 
 
 ### 2.4. Założenia projektowe
