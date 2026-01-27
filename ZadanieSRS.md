@@ -97,6 +97,26 @@ Na podstawie analizy interakcji z systemem (przedstawionej w diagramie przypadk�
     *   **Ryzyko:** Jeśli proces dodawania ubrań będzie zbyt uciążliwy, użytkownicy porzucą aplikację, zanim system zgromadzi wystarczająco danych, by być użytecznym. Aplikacja zostanie uznana za bezwartościową.
     *   **Plan walidacji:** Przed implementacją docelowej funkcjonalności, projektant UX stworzy klikalny prototyp (w Figmie) procesu dodawania ubrania i przeprowadzi testy użyteczności z 5 potencjalnymi użytkownikami, mierząc czas i subiektywną ocenę łatwości tego procesu.
 
+* **Założenie Dotyczące Łączności Sieciowej:**
+    * **Założenie:** Zakładamy, że docelowy użytkownik posiada stały dostęp do Internetu w momencie generowania outfitu (rano). Aplikacja nie będzie priorytetyzować pełnego trybu offline dla głównej funkcjonalności.
+    * **Ryzyko:** Brak dostępu do sieci uniemożliwi pobranie aktualnych danych pogodowych i synchronizację szafy z bazą Supabase.
+    * **Plan walidacji:** Implementacja prostego mechanizmu "offline state" informującego o braku połączenia, zamiast próby generowania błędnych propozycji.
+
+* **Założenie Dotyczące Jakości Zdjęć:**
+    * **Założenie:** Zakładamy, że użytkownicy dysponują smartfonami z aparatem umożliwiającym wykonanie zdjęcia o czytelności wystarczającej do rozpoznania koloru i typu ubrania przez ludzkie oko.
+    * **Ryzyko:** Zdjęcia o bardzo słabej jakości uniemożliwią sensowną prezentację outfitu na ekranie głównym, obniżając estetykę aplikacji.
+    * **Plan walidacji:** Wprowadzenie w interfejsie krótkiej instrukcji ("Wskazówki dla zdjęć") przed pierwszym dodaniem ubrania.
+
+* **Założenie Dotyczące Wydajności Backend-as-a-Service:**
+    * **Założenie:** Przyjmujemy, że darmowa instancja Supabase (Shared Instance) zapewni wystarczającą wydajność (czas odpowiedzi bazy danych < 200ms) dla małej grupy testowej (do 50 osób jednocześnie).
+    * **Ryzyko:** "Uśpienie" instancji po okresie nieaktywności (Cold Start), co spowoduje, że pierwszy użytkownik rano będzie czekał na załadowanie danych dłużej niż 10-15 sekund.
+    * **Plan walidacji:** Ustawienie prostego skryptu typu "ping" (np. przez GitHub Actions), który będzie wybudzał bazę danych przed godzinami porannymi (np. o 5:30 rano).
+
+* **Założenie Dotyczące Skalowalności MVP:**
+    * **Założenie:** Zakładamy, że w fazie studenckiej liczba dodanych ubrań globalnie nie przekroczy limitu 1GB Storage oferowanego przez darmowy plan Supabase.
+    * **Ryzyko:** Gwałtowny przyrost użytkowników lub przesyłanie zdjęć w formacie RAW szybko zablokuje możliwość dodawania nowych pozycji.
+    * **Plan walidacji:** Implementacja automatycznego resizingu zdjęć do formatu WebP o niskiej wadze bezpośrednio na urządzeniu użytkownika przed wysyłką.
+
 ## 2.5. **[DODANE] Cele Biznesowe Systemu WearWise**
 
 Celem biznesowym projektu WearWise jest stworzenie skalowalnej aplikacji mobilnej, która dostarcza realną wartość użytkownikowi końcowemu, jednocześnie umożliwiając dalszą monetyzację produktu w kolejnych wersjach.
