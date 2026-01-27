@@ -313,6 +313,63 @@ Celem biznesowym projektu WearWise jest stworzenie skalowalnej aplikacji mobilne
         *   Zwiększa **koszt operacyjny** (dodatkowe zasoby obliczeniowe w nocy).
         *   Pogarsza **elastyczność** - jeśli użytkownik doda nowe ubranie rano, nie zostanie ono uwzględnione w outficie na ten dzień, chyba że zaimplementuje się skomplikowaną logikę re-walidacji.
 
+### 4.4. Rozszerzone Atrybuty Jakościowe
+
+#### 4.4.1. Użyteczność (Usability) i UX
+* **Łatwość nauki (Learnability):** Nowy użytkownik musi być w stanie dodać pierwsze ubranie i wygenerować outfit bez korzystania z instrukcji obsługi w czasie < 3 minut.
+* **Estetyka interfejsu:** Interfejs musi być zgodny z zasadami "Clean Design" (minimalizm), aby zdjęcia ubrań użytkownika były głównym elementem wizualnym, a nie elementy UI.
+* **Obsługa jedną ręką:** Kluczowe elementy nawigacyjne (przycisk dodawania, menu główne) muszą znajdować się w dolnej części ekranu ("strefa kciuka"), aby ułatwić obsługę aplikacji w biegu.
+
+#### 4.4.2. Niezawodność (Reliability)
+* **Spójność danych (Data Consistency):** W przypadku błędu zapisu zdjęcia w chmurze, metadane ubrania w bazie danych nie mogą zostać utworzone (atomowość operacji).
+* **Odporność na błędy API:** Aplikacja musi działać stabilnie nawet w przypadku awarii dostawcy danych pogodowych (fallback do ostatniej znanej prognozy).
+* **Częstotliwość awarii:** Wskaźnik "Crash-free users" musi utrzymywać się na poziomie powyżej 98% w skali miesiąca.
+
+#### 4.4.3. Bezpieczeństwo i Prywatność (Security & Privacy)
+* **Izolacja danych (Multi-tenancy):** Dzięki mechanizmom Row Level Security (RLS) w Supabase, żaden użytkownik nie może uzyskać dostępu do URL-i zdjęć ani parametrów szafy innego użytkownika, nawet znając jego ID.
+* **Szyfrowanie połączeń:** Cała komunikacja między aplikacją mobilną a backendem musi odbywać się przez protokół HTTPS (TLS 1.2+).
+* **Zgodność z RODO (Prawo do zapomnienia):** System musi umożliwiać całkowite i nieodwracalne usunięcie wszystkich danych użytkownika (w tym plików binarnych zdjęć) w czasie rzeczywistym po potwierdzeniu żądania.
+
+#### 4.4.4. Testowalność (Testability)
+* **Separacja logiki:** Algorytm rekomendacji musi być wydzielony jako czysta funkcja (Pure Function), co pozwoli na przeprowadzanie testów jednostkowych (Unit Tests) bez konieczności symulowania połączenia z bazą danych czy GPS.
+* **Logowanie błędów:** System musi rejestrować błędy krytyczne (np. niepowodzenie generowania outfitu) w sposób umożliwiający deweloperowi odtworzenie ścieżki użytkownika (bez logowania danych wrażliwych).
+
+#### 4.4.5. Przenaszalność i Interoperacyjność (Portability)
+* **Niezależność od platformy:** Dzięki React Native, 90% kodu logiki biznesowej musi być współdzielone między systemami Android i iOS.
+* **Eksport danych:** System powinien umożliwiać (w fazie rozwojowej) eksport listy ubrań do formatu JSON/CSV, aby użytkownik nie czuł się "uwięziony" wewnątrz ekosystemu aplikacji (Vendor Lock-in).
+
+### 4.5. Tabele Scenariuszy (Dodatkowe)
+
+#### Scenariusz 4: Użyteczność (Błąd Onboardingu)
+| Element | Opis |
+| :--- | :--- |
+| **Źródło bodźca** | Użytkownik po raz pierwszy uruchamiający aplikację. |
+| **Bodziec** | Próba dodania ubrania bez udzielenia uprawnień do aparatu. |
+| **Artefakt** | Interfejs użytkownika (UI). |
+| **Środowisko** | Pierwsze uruchomienie aplikacji (Onboarding). |
+| **Reakcja** | System wyświetla czytelny komunikat z wyjaśnieniem, dlaczego dostęp jest potrzebny, i linkiem do ustawień systemowych. |
+| **Miara reakcji** | 90% użytkowników po przeczytaniu komunikatu skutecznie nadaje uprawnienia bez restartu aplikacji. |
+
+#### Scenariusz 5: Bezpieczeństwo (Próba Nieautoryzowanego Dostępu)
+| Element | Opis |
+| :--- | :--- |
+| **Źródło bodźca** | Złośliwy użytkownik / Hacker. |
+| **Bodziec** | Próba wywołania API Supabase z pominięciem interfejsu aplikacji w celu pobrania listy ubrań innego użytkownika. |
+| **Artefakt** | Warstwa bazy danych i API (Supabase Auth/RLS). |
+| **Środowisko** | Operacje produkcyjne. |
+| **Reakcja** | Baza danych odrzuca żądanie (status 403 Forbidden). |
+| **Miara reakcji** | 100% prób dostępu do danych nieprzypisanych do tokenu JWT użytkownika kończy się odmową. |
+
+#### Scenariusz 6: Skalowalność (Nagły Przyrost Danych)
+| Element | Opis |
+| :--- | :--- |
+| **Źródło bodźca** | Duża grupa użytkowników (np. po udostępnieniu na grupie studenckiej). |
+| **Bodziec** | Masowe przesyłanie zdjęć wysokiej rozdzielczości (np. 10MB każde). |
+| **Artefakt** | Mechanizm uploadu w aplikacji mobilnej. |
+| **Środowisko** | Wysokie obciążenie sieciowe. |
+| **Reakcja** | Aplikacja wykonuje kompresję (client-side resizing) przed wysyłką do Storage. |
+| **Miara reakcji** | Średni rozmiar przesyłanego pliku nie przekracza 300KB, niezależnie od oryginalnej rozdzielczości zdjęcia. |
+
 
 ## 5. Odkrywanie i Analiza Wymagań
 
