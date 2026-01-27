@@ -127,17 +127,21 @@ Celem biznesowym projektu WearWise jest stworzenie skalowalnej aplikacji mobilne
 * **CB-02:** Zapewnienie, aby co najmniej **70% użytkowników**, którzy dodadzą minimum 10 ubrań, korzystało z funkcji generowania outfitu przynajmniej raz dziennie.
 * **CB-03:** Zminimalizowanie bariery wejścia – pełna funkcjonalność MVP dostępna **bez opłat**.
 * **CB-04:** Zbudowanie kompletnego zbioru danych (szafy + preferencje), który umożliwi rozwój algorytmów rekomendacyjnych.
+* **CB-05:** **Optymalizacja Onboardingu:** Skrócenie czasu od pierwszego uruchomienia aplikacji do dodania pierwszego elementu garderoby do **poniżej 2 minut**, aby zminimalizować współczynnik porzuceń (churn).
 
 ### 2.5.2. Cele Średnioterminowe (6–18 miesięcy)
 
-* **CB-05:** Wprowadzenie modelu **Freemium** (np. wiele outfitów dziennie, planowanie tygodnia).
-* **CB-06:** Zwiększenie retencji użytkowników (D30) do poziomu **≥ 35%**.
-* **CB-07:** Przygotowanie architektury pod integrację z partnerami (marki odzieżowe, e-commerce).
+* **CB-06:** Wprowadzenie modelu **Freemium** (np. wiele outfitów dziennie, planowanie tygodnia).
+* **CB-07:** Zwiększenie retencji użytkowników (D30) do poziomu **≥ 35%**.
+* **CB-08:** Przygotowanie architektury pod integrację z partnerami (marki odzieżowe, e-commerce).
+* **CB-09:** **Viral Loop:** Wdrożenie funkcji udostępniania wygenerowanych zestawów w mediach społecznościowych, mającej na celu organiczne pozyskiwanie nowych użytkowników bez nakładów na marketing.
 
 ### 2.5.3. Cele Długoterminowe (Strategiczne)
 
 * **CB-08:** Pozycjonowanie WearWise jako „inteligentnego asystenta stylu”, a nie tylko katalogu ubrań.
-* **CB-09:** Możliwość wykorzystania zagregowanych (anonimowych) danych do analiz trendów modowych.
+* **CB-09:** Możliwość wykorzystania zagregowanych (anonimowych) danych do analiz trendów modowych w społeczeństwie.
+* **CB-10:** **Promocja Zrównoważonej Mody (Slow Fashion):** Edukacja użytkowników w zakresie lepszego wykorzystania posiadanych ubrań, co prowadzi do świadomego ograniczania zbędnych zakupów.
+* **CB-11:** **Analiza Trendów (B2B):** Możliwość wykorzystania zagregowanych (anonimowych) danych do analiz trendów modowych i zachowań konsumenckich w zależności od warunków atmosferycznych.
 
 
 ## 3. Wymagania Funkcjonalne
