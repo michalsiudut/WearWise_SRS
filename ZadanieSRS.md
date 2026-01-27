@@ -212,6 +212,57 @@ Celem biznesowym projektu WearWise jest stworzenie skalowalnej aplikacji mobilne
 
 ---
 
+### 3.6. Scenariusze Alternatywne, Błędy i Przypadki Brzegowe (Edge Cases)
+
+#### 3.6.1. Zarządzanie Szafą i Plikami
+* **S-ALT-01: Próba dodania duplikatu zdjęcia:**
+    * **Wyzwalacz:** Użytkownik próbuje dodać to samo zdjęcie ubrania po raz drugi.
+    * **Reakcja:** System porównuje hashe plików lub nazwy. Wyświetla komunikat: „To ubranie prawdopodobnie jest już w Twojej szafie. Czy na pewno chcesz je dodać ponownie?”.
+* **S-ALT-02: Przekroczenie limitu Storage (Free Tier):**
+    * **Wyzwalacz:** Użytkownik osiąga limit 1GB zdjęć w Supabase.
+    * **Reakcja:** System blokuje przycisk "Zapisz" i wyświetla komunikat: „Twoja szafa jest pełna. Usuń stare zdjęcia lub zmniejsz ich jakość, aby dodać nowe”.
+* **S-ALT-03: Przerwanie wysyłania zdjęcia (Błąd sieci):**
+    * **Wyzwalacz:** Utrata połączenia w trakcie uploadu dużego pliku.
+    * **Reakcja:** System automatycznie ponawia próbę (3-krotnie), a w przypadku porażki zapisuje szkic ubrania lokalnie i informuje: „Nie udało się wysłać zdjęcia. Spróbujemy ponownie, gdy odzyskasz zasięg”.
+
+#### 3.6.2. Algorytm i Logika Rekomendacji
+* **S-ALT-04: Szafa "Monotematyczna":**
+    * **Wyzwalacz:** Użytkownik ma 20 koszulek, ale 0 par spodni.
+    * **Reakcja:** System nie generuje niekompletnego outfitu. Wyświetla komunikat: „Brakuje nam spodni, aby stworzyć stylizację. Dodaj przynajmniej jedną parę, aby ruszyć!”.
+* **S-ALT-05: Ekstremalne warunki pogodowe (Out of Range):**
+    * **Wyzwalacz:** Temperatura poniżej -30°C lub powyżej +45°C.
+    * **Reakcja:** System wyświetla ostrzeżenie pogodowe: „Pogoda jest ekstremalna. Zalecamy pozostanie w domu. Jeśli musisz wyjść, wybierz najcieplejsze/najlżejsze ubrania z kategorii 'Specjalistyczne'”.
+* **S-ALT-06: Wszystkie ubrania "w praniu" (Planowana funkcja):**
+    * **Wyzwalacz:** Użytkownik oznaczył wszystkie pasujące do pogody ubrania jako "brudne".
+    * **Reakcja:** System proponuje ubrania o najbliższym indeksie ciepła, które są czyste, z adnotacją: „To nie jest idealny wybór na dziś, ale Twoje ulubione rzeczy są w praniu”.
+
+#### 3.6.3. Lokalizacja i Dane Zewnętrzne
+* **S-ALT-07: Użytkownik w podróży (Nagła zmiana lokalizacji):**
+    * **Wyzwalacz:** Użytkownik otworzył aplikację w Krakowie, a po 2 godzinach w Zakopanem (inna pogoda).
+    * **Reakcja:** System wykrywa zmianę lokalizacji > 50km i pyta: „Widzimy, że zmieniłeś miejsce pobytu. Czy chcesz odświeżyć propozycję stroju dla nowej lokalizacji?”.
+* **S-ALT-08: API Pogodowe zwraca "Null" lub dane niepełne:**
+    * **Wyzwalacz:** API dostarcza temperaturę, ale nie podaje opadów.
+    * **Reakcja:** System przyjmuje bezpieczne założenie (brak deszczu), ale wyświetla ikonę ostrzeżenia przy pogodzie: „Dane o opadach są niedostępne. Zabierz parasol na wszelki wypadek”.
+
+#### 3.6.4. Konto i Bezpieczeństwo
+* **S-ALT-09: Wygaśnięcie sesji (Token Expired):**
+    * **Wyzwalacz:** Użytkownik wraca do aplikacji po miesiącu nieaktywności.
+    * **Reakcja:** Zamiast nagłego błędu, system płynnie przekierowuje do ekranu logowania z komunikatem: „Twoja sesja wygasła. Zaloguj się ponownie, aby zobaczyć swoją szafę”.
+* **S-ALT-10: Próba usunięcia konta z aktywnymi danymi:**
+    * **Wyzwalacz:** Użytkownik klika "Usuń konto".
+    * **Reakcja:** System wymaga wpisania słowa "USUŃ" (potwierdzenie) i informuje o bezpowrotnym skasowaniu wszystkich zdjęć ubrań z serwera (zgodność z RODO).
+
+#### 3.6.5. Specyficzne błędy UX (Fat Finger & Misuse)
+* **S-ALT-11: Masowe usuwanie ubrań:**
+    * **Wyzwalacz:** Użytkownik zaznacza > 50 ubrań do usunięcia.
+    * **Reakcja:** Dodatkowy monit zabezpieczający: „Czy na pewno chcesz usunąć połowę swojej szafy? Tej operacji nie da się cofnąć”.
+* **S-ALT-12: Dodanie ubrania bez zdjęcia:**
+    * **Wyzwalacz:** Próba zapisu formularza z samymi tagami.
+    * **Reakcja:** System blokuje zapis. Każde ubranie w WearWise musi mieć reprezentację wizualną.
+
+---
+
+
 ## 4. Atrybuty Jakościowe
 
 ### 4.1. Priorytetyzacja Atrybutów
