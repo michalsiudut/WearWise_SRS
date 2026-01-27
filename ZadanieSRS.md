@@ -397,6 +397,198 @@ Celem biznesowym projektu WearWise jest stworzenie skalowalnej aplikacji mobilne
 
 ---
 
+## 6. Architektura Systemu i Integracje
+
+### 6.1. Architektura Wysokiego Poziomu (High-Level Architecture)
+System WearWise opiera się na architekturze klient-serwer z wykorzystaniem modelu BaaS (Backend as a Service), co minimalizuje nakłady na utrzymanie infrastruktury.
+
+* **Warstwa Klienta (Mobile App):** Napisana w React Native, odpowiedzialna za UI/UX, kompresję zdjęć, lokalne cachowanie prognozy pogody oraz logikę prezentacji.
+* **Warstwa Backend (Supabase):** * **PostgreSQL:** Przechowywanie relacyjnych danych o użytkownikach, szafach i parametrach ubrań.
+    * **Edge Functions:** Serverless functions do komunikacji z API pogodowym (ukrywanie kluczy API przed klientem).
+    * **Storage (Buckets):** Przechowywanie zoptymalizowanych plików graficznych ubrań.
+* **Warstwa Zewnętrzna:** API pogodowe (np. OpenWeatherMap lub Visual Crossing) dostarczające dane meteorologiczne w formacie JSON.
+
+### 6.2. Szczegółowy Przepływ Danych (Data Flow)
+
+#### 6.2.1. Proces dodawania ubrania (Workflow)
+1. Użytkownik wykonuje zdjęcie -> Aplikacja kompresuje plik (Client-side resize).
+2. Aplikacja wysyła plik binarny do *Supabase Storage*.
+3. Po sukcesie uploadu, aplikacja wysyła rekord z metadanymi (ID zdjęcia, kategoria, warmth) do tabeli *Clothes* w PostgreSQL.
+4. System potwierdza zapis i odświeża lokalny stan szafy.
+
+#### 6.2.2. Proces generowania rekomendacji
+1. Wyzwalacz: Otwarcie ekranu głównego.
+2. System sprawdza ważność `last_weather_check`. Jeśli > 1h, Edge Function pobiera nowe dane z API.
+3. Dane pogodowe są przekazywane do algorytmu (Dodatek D).
+4. Algorytm filtruje szafę (PostgreSQL Query z filtrami) i wybiera optymalny zestaw.
+5. Zestaw jest wyświetlany użytkownikowi jako gotowy obiekt Outfit.
+
+---
+
+## 7. Planowane Rozszerzenia (Post-MVP Roadmap)
+
+Sekcja ta definiuje kierunki rozwoju, które zostały świadomie wyłączone z wersji 1.0 (zgodnie z CB-05 i CB-07).
+
+1.  **Moduł Social Media:** Generowanie "OOTD" (Outfit Of The Day) w formie gotowej grafiki z brandingiem WearWise do publikacji na Instagramie.
+2.  **Inteligentne usuwanie tła:** Implementacja biblioteki (np. remove.bg API lub lokalny model TensorFlow.js), aby zdjęcia ubrań wyglądały profesjonalnie i spójnie.
+3.  **Kalendarz Stylizacji:** Możliwość planowania strojów na nadchodzące wydarzenia w kalendarzu (integracja z Google/Apple Calendar).
+4.  **Statystyki "Cost per Wear":** Analiza, które ubrania są noszone najczęściej, a które zalegają w szafie, wraz z szacunkowym kosztem jednego założenia.
+
+---
+
+## 8. Szczegółowa Specyfikacja Danych (Model Relacyjny)
+
+Ta sekcja opisuje strukturę bazy danych PostgreSQL w środowisku Supabase, co jest kluczowe dla zachowania spójności danych i wydajności algorytmu.
+
+### 8.1. Słownik Danych i Tabele
+
+* **Tabela `Profiles`:**
+    * `id`: **uuid** (Primary Key, powiązane z Supabase Auth)
+    * `username`: **varchar(50)**
+    * `style_preference`: **json** (wyniki ankiety WF-STYL-01)
+    * `created_at`: **timestamp**
+* **Tabela `Clothes`:**
+    * `id`: **uuid** (Primary Key)
+    * `owner_id`: **uuid** (Foreign Key -> Profiles.id)
+    * `image_url`: **text** (ścieżka do pliku w Storage)
+    * `category`: **enum** (top, bottom, shoes, outerwear, accessory)
+    * `warmth_index`: **integer** (skala 1-10)
+    * `is_waterproof`: **boolean**
+    * `color_hex`: **varchar(7)**
+    * `last_worn`: **timestamp** (wykorzystywane przez WF-OUTFIT-05)
+    * `tags`: **text[]** (np. ['formal', 'cotton', 'office'])
+* **Tabela `Outfits_History`:**
+    * `id`: **uuid**
+    * `user_id`: **uuid**
+    * `composition`: **json** (lista ID ubrań tworzących zestaw)
+    * `weather_snapshot`: **json** (warunki pogodowe w momencie generowania)
+    * `user_feedback`: **boolean** (ocena użytkownika: pozytywna/negatywna)
+
+---
+
+## 9. Rozszerzone Scenariusze Użycia (Use Case Descriptions)
+
+### 9.1. UC-01: Dodawanie nowego ubrania do szafy
+* **Aktor:** Użytkownik.
+* **Warunek wstępny:** Użytkownik jest zalogowany i nadał aplikacji uprawnienia do aparatu/galerii.
+* **Scenariusz główny:**
+    1. Użytkownik klika ikonę „+” na ekranie szafy.
+    2. System uruchamia interfejs aparatu systemowego.
+    3. Użytkownik wykonuje zdjęcie ubrania.
+    4. System wykonuje lokalną kompresję zdjęcia i wyświetla podgląd.
+    5. Użytkownik wybiera kategorię (np. „Spodnie”) i ustawia suwak ciepła.
+    6. System przesyła zdjęcie do Supabase Storage i tworzy rekord w tabeli `Clothes`.
+    7. System wyświetla komunikat: „Ubranie zostało dodane”.
+* **Rozszerzenia:**
+    * 3a. Użytkownik wybiera zdjęcie z galerii telefonu zamiast robić nowe.
+
+### 9.2. UC-02: Generowanie codziennej stylizacji
+* **Aktor:** Użytkownik, API Pogodowe.
+* **Scenariusz główny:**
+    1. Użytkownik otwiera aplikację (ekran Dashboard).
+    2. System pobiera lokalizację GPS (lub korzysta z ostatniej znanej).
+    3. System wysyła zapytanie do Edge Function po aktualne dane z API pogodowego.
+    4. Algorytm analizuje szafę użytkownika (wyklucza ubrania brudne/noszone wczoraj).
+    5. Algorytm wybiera zestaw optymalny termicznie (wg logiki z Dodatku D).
+    6. System renderuje podgląd outfitu na ekranie głównym.
+* **Sytuacje wyjątkowe:**
+    * 4a. Szafa posiada < 3 elementów -> Wyświetl komunikat o konieczności dodania ubrań.
+
+---
+
+## 10. Architektura Bezpieczeństwa (Security Design)
+
+### 10.1. Row Level Security (RLS)
+Każda tabela w bazie danych posiada aktywną politykę RLS. Uniemożliwia to każdemu użytkownikowi (nawet przy znajomości ID innego użytkownika) odczyt lub modyfikację danych, które do niego nie należą.
+```sql
+-- Przykład polityki bezpieczeństwa w Supabase
+CREATE POLICY "Users can only access their own data"
+ON public.clothes FOR ALL
+USING (auth.uid() = owner_id);
+```
+
+---
+
+## 11. Specyfikacja Interfejsu Użytkownika (UI View List)
+
+1.  **Dashboard:** Widget pogodowy + centralna karta wygenerowanego outfitu.
+2.  **Wirtualna Szafa:** Grid wszystkich ubrań z filtrami kategorii (Top, Bottom, Shoes).
+3.  **Formularz Edycji:** Ustawianie parametrów (ciepło, deszcz, tagi).
+4.  **Ankieta Stylu:** Interaktywny onboarding badający preferencje użytkownika.
+5.  **Ustawienia:** Zarządzanie kontem i opcje usuwania danych (RODO).
+
+---
+
+## 12. Specyfikacja Interfejsu Użytkownika (UI View List)
+
+Sekcja ta definiuje strukturę ekranów aplikacji, co jest niezbędne dla zapewnienia spójności nawigacyjnej (User Flow).
+
+### 12.1. Hierarchia Ekranów
+1.  **Ekran Powitalny (Splash Screen):** Animowane logo, inicjalizacja sesji Supabase.
+2.  **Ekran Onboardingu:** Karuzela (3 slajdy) wyjaśniająca wartość aplikacji.
+3.  **Ekran Autoryzacji:** Logowanie / Rejestracja / Reset hasła.
+4.  **Ekran Ankiety Stylu:** Interaktywny quiz (WF-STYL-01).
+5.  **Ekran Główny (Dashboard):**
+    * Widget pogodowy (aktualna temp + lokalizacja).
+    * Centralna sekcja z wygenerowanym outfitid-em (zdjęcia ubrań w formie kolażu).
+    * Przycisk "Losuj ponownie" (Shuffle).
+6.  **Wirtualna Szafa (Grid View):** Przegląd wszystkich ubrań z podziałem na kategorie.
+7.  **Szczegóły Ubrania:** Podgląd zdjęcia, edycja tagów, historia założeń.
+8.  **Ustawienia Profilu:** Zarządzanie kontem, zmiana preferencji, usuwanie danych (RODO).
+
+### 12.2. Standardy Projektowe (Style Guide)
+* **Typografia:** Systemowe fonty (San Francisco na iOS, Roboto na Androidzie) dla maksymalnej wydajności.
+* **Kolorystyka:** Tryb Dark Mode jako domyślny (oszczędność baterii na ekranach OLED). Akcenty w kolorze Indigo (#4F46E5).
+* **Interakcje:** Wykorzystanie biblioteki `react-native-reanimated` do płynnych przejść między szafą a detalem ubrania.
+
+---
+
+## 13. Szczegółowa Logika Ankiety Stylu (WF-STYL-01)
+
+Ankieta definiuje wektor preferencji użytkownika $V_{pref}$, który modyfikuje funkcję kosztu algorytmu (Dodatek D).
+
+### 13.1. Zestaw Pytań i Wagi (Scoring Matrix)
+
+| ID | Pytanie | Opcje odpowiedzi | Wpływ na algorytm |
+| :--- | :--- | :--- | :--- |
+| **P1** | Jak oceniasz swoją tolerancję na zimno? | 1 (Zmarzluch) - 5 (Gorący typ) | Modyfikuje `Target Warmth` o $\pm 20\%$. |
+| **P2** | Jaki styl dominuje w Twojej szafie? | Casual, Elegant, Sport, Streetwear | Nadaje bonusy (-15 pkt) dla ubrań z danym tagiem. |
+| **P3** | Czy lubisz eksperymentować z kolorami? | Tak (High Contrast) / Nie (Monochrome) | Aktywuje/Dezaktywuje kary za "gryzące się kolory". |
+| **P4** | Jak często chodzisz pieszo? | Rzadko / Często | Zwiększa wagę atrybutu `rain_index` przy opadach. |
+
+---
+
+## 14. Architektura Komunikacji (API Contracts)
+
+### 14.1. Endpointy Edge Functions (Supabase)
+
+#### `POST /functions/v1/generate-outfit`
+* **Opis:** Główny mózg operacyjny aplikacji.
+* **Input:** `user_id`, `lat`, `lon`, `occasion_id`.
+* **Proces:** 1. Pobiera pogodę.
+    2. Pobiera listę ubrań użytkownika.
+    3. Wykonuje obliczenia kosztu (Dodatek D).
+* **Output:** ```json
+    {
+      "outfit_id": "uuid",
+      "items": ["id_1", "id_2", "id_3"],
+      "weather_summary": "Sunny, 22°C",
+      "reasoning": "Wybraliśmy ten zestaw, bo będzie dziś wiało."
+    }
+    ```
+
+---
+
+## 15. Zarządzanie Zasobami i Wydajnością (Asset Management)
+
+### 15.1. Strategia Optymalizacji Obrazów
+Ze względu na ograniczenia (2.3), system stosuje wielostopniową optymalizację:
+1.  **Client-side Clipping:** Użytkownik jest zachęcany do kadrowania zdjęcia do proporcji 1:1.
+2.  **WebP Encoding:** Każde zdjęcie przed wysyłką jest konwertowane do formatu `.webp` (lepsza kompresja niż JPEG).
+3.  **Lazy Loading:** Zdjęcia w szafie są ładowane sekwencyjnie (tylko te widoczne na ekranie).
+
+---
+
 ## Dodatki
 
 ### Dodatek A: Modele Analityczne
@@ -537,3 +729,30 @@ graph TD
     class Input,Physics,Valid,L1,L2,L3,Combo,Calc1,Calc2,Calc3,Sum,Best process;
     class Filter,Layers,Score decision;
     class Start,Output terminator;
+```
+
+## Dodatek E: Matryca Ryzyk i Plan Mitygacji
+
+| Ryzyko | Prawdopodobieństwo | Wpływ | Plan Mitygacji |
+| :--- | :--- | :--- | :--- |
+| Przekroczenie limitów darmowego API | Wysokie | Krytyczny | Agresywne cachowanie pogody (min. 1h). |
+| Brak zgody na GPS | Średnie | Średni | Ręczny wybór miasta przez użytkownika. |
+| Cold Start bazy danych | Średnie | Niski | Skrypt wybudzający (ping) w godzinach porannych. |
+
+---
+
+## Dodatek F: Słownik Pojęć (Glossary)
+
+* **BaaS (Backend as a Service):** Zewnętrzna platforma (Supabase) obsługująca bazę i autentykację.
+* **Edge Function:** Kod serverless wykonujący operacje po stronie backendu (np. proxy do API pogody).
+* **Signed URL:** Tymczasowy link do pliku w chmurze, wygasający po określonym czasie.
+
+---
+
+## Dodatek G: Specyfikacja Testów Akceptacyjnych (UAT)
+
+Dla każdego wymagania funkcjonalnego definiujemy kryterium sukcesu.
+
+* **UAT-01 (Dodawanie):** Tester wykonuje zdjęcie buta. Kryterium: Zdjęcie pojawia się w sekcji "Buty" w czasie < 5s.
+* **UAT-02 (Pogoda):** Tester zmienia lokalizację w symulatorze na deszczowy Londyn. Kryterium: System sugeruje ubranie z `rain_index > 7`.
+* **UAT-03 (Bezpieczeństwo):** Użytkownik B próbuje wejść na URL zdjęcia użytkownika A. Kryterium: Otrzymuje błąd XML "Access Denied".
