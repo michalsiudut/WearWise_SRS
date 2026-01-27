@@ -519,7 +519,7 @@ USING (auth.uid() = owner_id);
 
 ---
 
-## 12. Specyfikacja Interfejsu Użytkownika (UI View List)
+## 12. Specyfikacja Interfejsu Użytkownika (UI View List) - rozszerzona
 
 Sekcja ta definiuje strukturę ekranów aplikacji, co jest niezbędne dla zapewnienia spójności nawigacyjnej (User Flow).
 
